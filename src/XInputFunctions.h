@@ -5,6 +5,7 @@
 
 NAN_METHOD(IsConnected);
 NAN_METHOD(GetState);
+NAN_METHOD(GetCapabilities);
 NAN_METHOD(Vibrate);
 
 #endif

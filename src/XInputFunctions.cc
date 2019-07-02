@@ -1,7 +1,8 @@
 #include "XInputFunctions.h"
 #include <XInput.h>
 
-NAN_METHOD(Vibrate) {
+NAN_METHOD(Vibrate)
+{
 	XINPUT_VIBRATION vibration;
 	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
 
@@ -15,26 +16,44 @@ NAN_METHOD(Vibrate) {
 	XInputSetState((WORD)info[0]->IntegerValue(), &vibration);
 }
 
-NAN_METHOD(IsConnected) {
+NAN_METHOD(IsConnected)
+{
 	XINPUT_STATE controllerState;
 	ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
 
 	// TODO: Verify parameters
 	DWORD result = XInputGetState((WORD)info[0]->IntegerValue(), &controllerState);
-	if(result == ERROR_SUCCESS) {
+	if (result == ERROR_SUCCESS)
+	{
 		info.GetReturnValue().Set(true);
-	} else {
+	}
+	else
+	{
 		info.GetReturnValue().Set(false);
 	}
 }
+NAN_METHOD(GetCapabilities)
+{
+	XINPUT_CAPABILITIES controllerState;
+	ZeroMemory(&controllerState, sizeof(XINPUT_CAPABILITIES));
 
-NAN_METHOD(GetState) {
+	// TODO: Verify parameters
+	DWORD result = XInputGetCapabilities((WORD)info[0]->IntegerValue(), 0, &controllerState);
+
+	v8::Local<v8::Object> obj = Nan::New<v8::Object>();
+	// Digital, i.e. buttons
+	obj->Set(Nan::New("type").ToLocalChecked(), Nan::New(controllerState.Type));
+	obj->Set(Nan::New("subType").ToLocalChecked(), Nan::New(controllerState.SubType));
+	obj->Set(Nan::New("flags").ToLocalChecked(), Nan::New(controllerState.Flags));
+	info.GetReturnValue().Set(obj);
+}
+NAN_METHOD(GetState)
+{
 	XINPUT_STATE controllerState;
 	ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
 
 	// TODO: Verify parameters
 	DWORD result = XInputGetState((WORD)info[0]->IntegerValue(), &controllerState);
-
 
 	v8::Local<v8::Object> objButtons = Nan::New<v8::Object>();
 	objButtons->Set(Nan::New("a").ToLocalChecked(), Nan::New((controllerState.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0));
@@ -60,11 +79,9 @@ NAN_METHOD(GetState) {
 	objControl->Set(Nan::New("back").ToLocalChecked(), Nan::New((controllerState.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0));
 	objControl->Set(Nan::New("start").ToLocalChecked(), Nan::New((controllerState.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0));
 
-
 	v8::Local<v8::Object> objTrigger = Nan::New<v8::Object>();
 	objTrigger->Set(Nan::New("left").ToLocalChecked(), Nan::New((float)controllerState.Gamepad.bLeftTrigger / 255));
 	objTrigger->Set(Nan::New("right").ToLocalChecked(), Nan::New((float)controllerState.Gamepad.bRightTrigger / 255));
-
 
 	v8::Local<v8::Object> objLeftStick = Nan::New<v8::Object>();
 	objLeftStick->Set(Nan::New("x").ToLocalChecked(), Nan::New(controllerState.Gamepad.sThumbLX));
@@ -73,7 +90,6 @@ NAN_METHOD(GetState) {
 	v8::Local<v8::Object> objRightStick = Nan::New<v8::Object>();
 	objRightStick->Set(Nan::New("x").ToLocalChecked(), Nan::New(controllerState.Gamepad.sThumbRX));
 	objRightStick->Set(Nan::New("y").ToLocalChecked(), Nan::New(controllerState.Gamepad.sThumbRY));
-
 
 	v8::Local<v8::Object> obj = Nan::New<v8::Object>();
 	// Digital, i.e. buttons
@@ -87,8 +103,6 @@ NAN_METHOD(GetState) {
 	obj->Set(Nan::New("trigger").ToLocalChecked(), objTrigger);
 	obj->Set(Nan::New("leftstick").ToLocalChecked(), objLeftStick);
 	obj->Set(Nan::New("rightstick").ToLocalChecked(), objRightStick);
-
-
 
 	info.GetReturnValue().Set(obj);
 }

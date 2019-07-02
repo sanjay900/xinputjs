@@ -8,6 +8,7 @@ var xinput = require('../');
 	if(xinput.IsConnected(controllerNum)) {
 		// Dump the current state
 		console.log("Controller %d state:", controllerNum, xinput.GetState(controllerNum));
+		console.log("Controller %d state:", controllerNum, xinput.GetCapabilities(controllerNum));
 		/* -> {
 		  // Digital inputs
 		  buttons: { a: false, b: false, x: false, y: false },
